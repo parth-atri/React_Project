@@ -1,24 +1,48 @@
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import "./App.css";
 import NavBar from "./components/NavBar";
-import { type TransactionRecord } from "./data/transactions";
 import DashboardPage from "./pages/DashboardPage";
 import LandingPage from "./pages/LandingPage";
 import NewTransactionPage from "./pages/NewTransactionPage";
+import { type TransactionRecord } from "./types/transaction-record";
 
 function App() {
-  const [transactionsList, setTransactionsList] = useState<TransactionRecord[]>(
-    []
-  );
+  const [transactionsHistoryList, setTransactionsHistoryList] = useState<
+    TransactionRecord[]
+  >([]);
 
-  const handleAddTransaction = (newTransaction: TransactionRecord) => {
-    setTransactionsList((prevTransactions) => [
-      ...prevTransactions,
-      newTransaction,
+  const getTransactionsHistoryList = () => {
+    fetch("http://localhost:3030/transactions")
+      .then((response) => response.json())
+      .then((transactionsData) => setTransactionsHistoryList(transactionsData))
+      .catch((error) => console.log("error", error));
+  };
+
+  const handleAddTransaction = (newTransactionRecord: TransactionRecord) => {
+    fetch("http://localhost:3030/transactions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newTransactionRecord),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+      })
+      .catch((error) => console.error("Error:", error));
+
+    setTransactionsHistoryList((prevTransactionHistory) => [
+      ...prevTransactionHistory,
+      newTransactionRecord,
     ]);
   };
+
+  useEffect(() => {
+    getTransactionsHistoryList();
+  }, [transactionsHistoryList]);
 
   return (
     <Router>
@@ -29,7 +53,9 @@ function App() {
           element={
             <>
               <NavBar />
-              <DashboardPage transactionsData={transactionsList} />
+              <DashboardPage
+                transactionsHistoryList={transactionsHistoryList}
+              />
             </>
           }
         />

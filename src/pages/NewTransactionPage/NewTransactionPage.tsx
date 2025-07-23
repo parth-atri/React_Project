@@ -10,7 +10,7 @@ import {
 } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
-import { type TransactionRecord } from "../../data/transactions";
+import { type TransactionRecord } from "../../types";
 
 interface NewTransactionPageProps {
   onAddTransaction: (data: TransactionRecord) => void;
@@ -46,7 +46,7 @@ const NewTransactionPage: React.FC<NewTransactionPageProps> = ({
                 <Form.Control
                   type="number"
                   step="0.01"
-                  placeholder="Enter amount"
+                  placeholder="Enter amount (USD)"
                   {...register("amount", {
                     required: "Amount is required",
                     min: {

@@ -5,19 +5,21 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import React, { useState } from "react";
-import { type TransactionRecord } from "../../data/transactions";
+import { type TransactionRecord } from "../../types";
 
 type TableProps = {
-  transactionsData: TransactionRecord[];
+  transactionsHistoryList: TransactionRecord[];
 };
 
-const TransactionsTable: React.FC<TableProps> = ({ transactionsData }) => {
-  const [data, _setData] = useState([...transactionsData]);
+const TransactionsTable: React.FC<TableProps> = ({
+  transactionsHistoryList,
+}) => {
+  const [data, _setData] = useState([...transactionsHistoryList]);
   const columnHelper = createColumnHelper<TransactionRecord>();
   const columns = [
     columnHelper.accessor("amount", {
       cell: (info) => info.getValue(),
-      header: () => "Amount",
+      header: () => "Amount ($)",
     }),
     columnHelper.accessor("date", {
       cell: (info) => info.getValue(),

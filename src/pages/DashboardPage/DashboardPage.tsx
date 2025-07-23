@@ -2,14 +2,16 @@ import React from "react";
 import Button from "react-bootstrap/esm/Button";
 import Container from "react-bootstrap/esm/Container";
 import TransactionsTable from "../../components/TransactionsTable";
-import { type TransactionRecord } from "../../data/transactions";
+import { type TransactionRecord } from "../../types";
 import styles from "./DashboardPage.module.css";
 
 interface DashboardPageProps {
-  transactionsData: TransactionRecord[] | [];
+  transactionsHistoryList: TransactionRecord[] | [];
 }
 
-const DashboardPage: React.FC<DashboardPageProps> = ({ transactionsData }) => {
+const DashboardPage: React.FC<DashboardPageProps> = ({
+  transactionsHistoryList,
+}) => {
   return (
     <Container className="d-flex flex-column justify-content-center vh-100">
       <div className={styles.dashboardContainer}>
@@ -23,8 +25,10 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ transactionsData }) => {
             New Transaction
           </Button>
         </div>
-        {transactionsData.length > 0 ? (
-          <TransactionsTable transactionsData={transactionsData} />
+        {transactionsHistoryList.length > 0 ? (
+          <TransactionsTable
+            transactionsHistoryList={transactionsHistoryList}
+          />
         ) : (
           <div className={styles.noTransactions}>
             <h2>No transactions available</h2>
