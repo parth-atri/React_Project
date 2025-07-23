@@ -21,8 +21,10 @@ const NavBar: React.FC = () => {
                 Dashboard
               </Nav.Link>
               <Nav.Link
-                href="/"
-                className={location.pathname === "/" ? "fw-bold" : ""}
+                href="/new-transaction"
+                className={
+                  location.pathname === "/new-transaction" ? "fw-bold" : ""
+                }
               >
                 New Transaction
               </Nav.Link>
