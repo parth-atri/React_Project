@@ -41,7 +41,7 @@ const TransactionsTable: React.FC<TableProps> = ({ transactionsData }) => {
 
   return (
     <div>
-      <table>
+      <table className="table table-striped table-bordered">
         <thead>
           {transactionsTable.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>

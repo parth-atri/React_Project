@@ -1,11 +1,12 @@
 import React from "react";
+import Container from "react-bootstrap/esm/Container";
 import TransactionsTable from "../../components/TransactionsTable";
 import { transactionsData } from "../../data/transactions";
 import styles from "./DashboardPage.module.css";
 
 const DashboardPage: React.FC = () => {
   return (
-    <div className={styles.container}>
+    <Container className="d-flex flex-column justify-content-center vh-100">
       {transactionsData.length > 0 ? (
         <div className={styles.dashboardContainer}>
           <h1>Dashboard</h1>
@@ -17,7 +18,7 @@ const DashboardPage: React.FC = () => {
           <p>Please add some transactions to view them here.</p>
         </div>
       )}
-    </div>
+    </Container>
   );
 };
 
