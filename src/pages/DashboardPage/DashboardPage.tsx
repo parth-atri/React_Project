@@ -7,10 +7,15 @@ import styles from "./DashboardPage.module.css";
 
 interface DashboardPageProps {
   transactionsHistoryList: TransactionRecord[] | [];
+  onUpdateTransaction: (
+    id: number,
+    updatedTransactionRecord: TransactionRecord
+  ) => void;
 }
 
 const DashboardPage: React.FC<DashboardPageProps> = ({
   transactionsHistoryList,
+  onUpdateTransaction,
 }) => {
   return (
     <Container className="d-flex flex-column justify-content-center vh-100">
@@ -28,6 +33,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({
         {transactionsHistoryList.length > 0 ? (
           <TransactionsTable
             transactionsHistoryList={transactionsHistoryList}
+            onUpdateTransaction={onUpdateTransaction}
           />
         ) : (
           <div className={styles.noTransactions}>

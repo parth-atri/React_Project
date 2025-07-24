@@ -50,17 +50,18 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
                 value: 0.01,
                 message: "Amount must be greater than 0",
               },
+              valueAsNumber: true,
             })}
             isInvalid={!!errors.amount}
           />
         </InputGroup>
-
         {errors.amount && (
           <Alert variant="danger" className="mt-2">
             {errors.amount.message}
           </Alert>
         )}
       </Form.Group>
+
       <Form.Group className="mb-3" controlId="date">
         <Form.Label>Date</Form.Label>
         <Form.Control
@@ -91,6 +92,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
           </Alert>
         )}
       </Form.Group>
+
       <Form.Group className="mb-3" controlId="category">
         <Form.Label>Category</Form.Label>
         <Form.Control

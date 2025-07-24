@@ -31,6 +31,7 @@ function App() {
       .then((response) => response.json())
       .then((data) => {
         console.log("Success:", data);
+        getTransactionsHistoryList();
       })
       .catch((error) => console.error("Error:", error));
 
@@ -40,9 +41,33 @@ function App() {
     ]);
   };
 
+  const handleUpdateTransaction = (
+    id: number,
+    updatedTransactionRecord: TransactionRecord
+  ) => {
+    fetch(`http://localhost:3030/transactions/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedTransactionRecord),
+    })
+      .then((response) => response.json())
+      .then((updatedTransactionRecord) => {
+        setTransactionsHistoryList((prevTransactionHistory) =>
+          prevTransactionHistory.map((transaction) =>
+            transaction.id === id
+              ? { ...transaction, ...updatedTransactionRecord }
+              : transaction
+          )
+        );
+      })
+      .catch((error) => console.error("Error:", error));
+  };
+
   useEffect(() => {
     getTransactionsHistoryList();
-  }, [transactionsHistoryList]);
+  }, []);
 
   return (
     <Router>
@@ -55,6 +80,7 @@ function App() {
               <NavBar />
               <DashboardPage
                 transactionsHistoryList={transactionsHistoryList}
+                onUpdateTransaction={handleUpdateTransaction}
               />
             </>
           }

@@ -27,20 +27,6 @@
       "date": "2023-10-04",
       "type": "income",
       "category": "Freelance Work"
-    },
-    {
-      "amount": "2020",
-      "date": "2025-07-08",
-      "type": "expense",
-      "category": "test",
-      "id": 5
-    },
-    {
-      "amount": "1000",
-      "date": "2025-07-21",
-      "type": "expense",
-      "category": "Car rims",
-      "id": 6
     }
   ]
 }
