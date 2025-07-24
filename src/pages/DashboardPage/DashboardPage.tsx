@@ -22,12 +22,13 @@ const DashboardPage: React.FC<DashboardPageProps> = ({
       <div className={styles.dashboardContainer}>
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h1 className="">Dashboard</h1>
-          <Button
-            variant="primary"
-            className={styles.newTransactionButton}
-            href="/new-transaction"
-          >
-            New Transaction
+          <Button variant="primary" className={styles.newTransactionButton}>
+            <a
+              href="/new-transaction"
+              className="text-white text-decoration-none"
+            >
+              <span>New Transaction</span>
+            </a>
           </Button>
         </div>
         {transactionsHistoryList.length > 0 ? (

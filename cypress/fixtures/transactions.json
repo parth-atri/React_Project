@@ -1,0 +1,30 @@
+[
+    {
+      "id": 1,
+      "amount": 100,
+      "date": "2023-10-01",
+      "type": "income",
+      "category": "Salary"
+    },
+    {
+      "id": 2,
+      "amount": 50,
+      "date": "2023-10-02",
+      "type": "expense",
+      "category": "Groceries"
+    },
+    {
+      "id": 3,
+      "amount": 20,
+      "date": "2023-10-03",
+      "type": "expense",
+      "category": "Transport"
+    },
+    {
+      "id": 4,
+      "amount": 200,
+      "date": "2023-10-04",
+      "type": "income",
+      "category": "Freelance Work"
+    }
+  ]
