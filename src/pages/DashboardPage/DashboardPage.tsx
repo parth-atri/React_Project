@@ -11,11 +11,13 @@ interface DashboardPageProps {
     id: number,
     updatedTransactionRecord: TransactionRecord
   ) => void;
+  onDeleteTransaction: (id: number) => void;
 }
 
 const DashboardPage: React.FC<DashboardPageProps> = ({
   transactionsHistoryList,
   onUpdateTransaction,
+  onDeleteTransaction,
 }) => {
   return (
     <Container className="d-flex flex-column justify-content-center vh-100">
@@ -35,6 +37,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({
           <TransactionsTable
             transactionsHistoryList={transactionsHistoryList}
             onUpdateTransaction={onUpdateTransaction}
+            onDeleteTransaction={onDeleteTransaction}
           />
         ) : (
           <div className={styles.noTransactions}>

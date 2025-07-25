@@ -65,6 +65,18 @@ function App() {
       .catch((error) => console.error("Error:", error));
   };
 
+  const handleDeleteTransaction = (id: number) => {
+    fetch(`http://localhost:3030/transactions/${id}`, {
+      method: "DELETE",
+    })
+      .then(() => {
+        setTransactionsHistoryList((prevTransactionHistory) =>
+          prevTransactionHistory.filter((transaction) => transaction.id !== id)
+        );
+      })
+      .catch((error) => console.error("Error:", error));
+  };
+
   useEffect(() => {
     getTransactionsHistoryList();
   }, []);
@@ -81,6 +93,7 @@ function App() {
               <DashboardPage
                 transactionsHistoryList={transactionsHistoryList}
                 onUpdateTransaction={handleUpdateTransaction}
+                onDeleteTransaction={handleDeleteTransaction}
               />
             </>
           }

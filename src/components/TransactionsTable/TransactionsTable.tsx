@@ -5,7 +5,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import React, { useEffect, useState } from "react";
-import { Button, Offcanvas } from "react-bootstrap";
+import { Button, Modal, Offcanvas } from "react-bootstrap";
 import { type TransactionRecord } from "../../types";
 import TransactionForm from "../TransactionForm";
 
@@ -15,11 +15,13 @@ type TableProps = {
     id: number,
     updatedTransactionRecord: TransactionRecord
   ) => void;
+  onDeleteTransaction: (id: number) => void;
 };
 
 const TransactionsTable: React.FC<TableProps> = ({
   transactionsHistoryList,
   onUpdateTransaction,
+  onDeleteTransaction,
 }) => {
   const [data, _setData] = useState([...transactionsHistoryList]);
   const [selectedTransactionId, setSelectedTransactionId] = useState<
@@ -29,6 +31,8 @@ const TransactionsTable: React.FC<TableProps> = ({
     TransactionRecord | undefined
   >(undefined);
   const [showEditOffcanvas, setShowEditOffcanvas] = useState(false);
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const handleEditClick = (transactionId: number) => {
     setSelectedTransactionId(transactionId);
@@ -54,11 +58,29 @@ const TransactionsTable: React.FC<TableProps> = ({
     setSelectedTransactionId(null);
   };
 
+  const handleDeleteClick = (transactionId: number) => {
+    setSelectedTransactionId(transactionId);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirmation = () => {
+    if (selectedTransactionId) {
+      onDeleteTransaction(selectedTransactionId);
+      handleDeleteModalClose();
+    }
+  };
+
+  const handleDeleteModalClose = () => {
+    setShowDeleteModal(false);
+    setSelectedTransactionId(null);
+  };
+
   const columnHelper = createColumnHelper<TransactionRecord>();
   const columns = [
-    columnHelper.accessor("id", {
-      cell: (info) => info.getValue(),
+    columnHelper.display({
+      id: "rowNumber",
       header: () => "#",
+      cell: (info) => info.row.index + 1,
     }),
     columnHelper.accessor("amount", {
       cell: (info) => info.getValue(),
@@ -84,10 +106,17 @@ const TransactionsTable: React.FC<TableProps> = ({
           <Button
             size="sm"
             className="me-2"
-            onClick={() => handleEditClick(row.index + 1)}
+            onClick={() => handleEditClick(row.original.id)}
             variant="outline-primary"
           >
             Edit
+          </Button>
+          <Button
+            size="sm"
+            onClick={() => handleDeleteClick(row.original.id)}
+            variant="outline-danger"
+          >
+            Delete
           </Button>
         </div>
       ),
@@ -155,6 +184,24 @@ const TransactionsTable: React.FC<TableProps> = ({
           )}
         </Offcanvas.Body>
       </Offcanvas>
+
+      <Modal show={showDeleteModal} onHide={handleDeleteModalClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Deletion?</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete this transaction? This action cannot
+          be undone.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleDeleteModalClose}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleDeleteConfirmation}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 };
