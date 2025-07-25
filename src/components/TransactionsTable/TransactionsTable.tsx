@@ -83,16 +83,22 @@ const TransactionsTable: React.FC<TableProps> = ({
       cell: (info) => info.row.index + 1,
     }),
     columnHelper.accessor("amount", {
-      cell: (info) => info.getValue(),
+      cell: (info) => {
+        const transactionType = info.row.original.type;
+        const amount = info.getValue();
+        const textColor =
+          transactionType === "expense" ? "text-danger" : "text-success";
+        return (
+          <span className={textColor}>
+            {transactionType === "expense" ? "-" : "+"}${amount.toFixed(2)}
+          </span>
+        );
+      },
       header: () => "Amount ($)",
     }),
     columnHelper.accessor("date", {
-      cell: (info) => info.getValue(),
+      cell: (info) => new Date(info.getValue()).toLocaleDateString(),
       header: () => "Date",
-    }),
-    columnHelper.accessor("type", {
-      cell: (info) => info.getValue(),
-      header: () => "Type",
     }),
     columnHelper.accessor("category", {
       cell: (info) => info.getValue(),
@@ -141,7 +147,7 @@ const TransactionsTable: React.FC<TableProps> = ({
             {transactionsTable.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <th key={header.id}>
+                  <th key={header.id} className="text-center">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -157,7 +163,7 @@ const TransactionsTable: React.FC<TableProps> = ({
             {transactionsTable.getRowModel().rows.map((row) => (
               <tr key={row.id}>
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id}>
+                  <td key={cell.id} className="text-center">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}

@@ -61,6 +61,7 @@ function App() {
               : transaction
           )
         );
+        getTransactionsHistoryList();
       })
       .catch((error) => console.error("Error:", error));
   };
@@ -73,6 +74,7 @@ function App() {
         setTransactionsHistoryList((prevTransactionHistory) =>
           prevTransactionHistory.filter((transaction) => transaction.id !== id)
         );
+        getTransactionsHistoryList();
       })
       .catch((error) => console.error("Error:", error));
   };
