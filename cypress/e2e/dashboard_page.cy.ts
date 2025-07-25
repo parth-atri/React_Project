@@ -126,4 +126,66 @@ describe("Expense Tracker Dashboard Page Tests", () => {
         cy.contains(newDate);
       });
   });
+
+  it("should allow for deleting transactions", () => {
+    let firstTransactionAmount;
+    let firstTransactionDate;
+    let firstTransactionType;
+    let firstTransactionCategory;
+
+    // Current number of records
+    cy.get("table tbody tr").should("have.length", 4);
+
+    // Getting the delete button for the first transaction
+    cy.get("table tbody tr")
+      .first()
+      .within(() => {
+        firstTransactionAmount = cy.get("td").eq(0).invoke("text");
+        firstTransactionDate = cy.get("td").eq(1).invoke("text");
+        firstTransactionType = cy.get("td").eq(2).invoke("text");
+        firstTransactionCategory = cy.get("td").eq(3).invoke("text");
+        cy.get("Button").contains("Delete").should("exist");
+        cy.get("Button").contains("Delete").click();
+      });
+
+    // Users should see a confirmation dialog
+    cy.get("div[class='modal-header']")
+      .should("exist")
+      .should("contain", "Confirm Deletion?");
+
+    // Intercepting the DELETE request
+    console.log("url", `${jsonServerUrl}/1`);
+    cy.intercept("DELETE", `${jsonServerUrl}/1`, (req) => {
+      req.reply({
+        statusCode: 200,
+      });
+    }).as("deleteTransaction");
+
+    cy.get("div[class='modal-footer']")
+      .should("exist")
+      .within(() => {
+        cy.get("Button").contains("Cancel").should("exist");
+        cy.get("Button").contains("Delete").should("exist");
+        cy.get("Button").contains("Delete").click(); // Confirming the deletion
+      });
+
+    cy.wait("@deleteTransaction").then((interception) => {
+      expect(interception.response.statusCode).to.eq(200);
+    });
+
+    // Confirming that the transaction is removed from the table
+    cy.get("table tbody tr").should("have.length", 3);
+
+    cy.get("table tbody tr")
+      .first()
+      .within(() => {
+        cy.get("td").eq(0).should("not.contain", firstTransactionAmount);
+        cy.get("td").eq(1).should("not.contain", firstTransactionDate);
+        cy.get("td").eq(2).should("not.contain", firstTransactionType);
+        cy.get("td").eq(3).should("not.contain", firstTransactionCategory);
+      });
+
+    // Verifying that the user is still on the dashboard page
+    cy.url().should("include", "/dashboard");
+  });
 });
