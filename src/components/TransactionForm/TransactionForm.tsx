@@ -28,6 +28,14 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
     },
   });
 
+  const dateToday = new Date().toISOString().slice(0, 10);
+
+  const validateDate = (value: string) => {
+    const selectedDate = new Date(value);
+    const today = new Date(dateToday);
+    return selectedDate <= today || "Date cannot be in the future";
+  };
+
   useEffect(() => {
     if (initialValues) {
       reset(initialValues);
@@ -66,7 +74,11 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
         <Form.Label>Date</Form.Label>
         <Form.Control
           type="date"
-          {...register("date", { required: "Date is required" })}
+          {...register("date", {
+            required: "Date is required",
+            validate: validateDate,
+          })}
+          defaultValue={dateToday}
           isInvalid={!!errors.date}
         />
         {errors.date && (

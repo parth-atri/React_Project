@@ -15,7 +15,6 @@ const NewTransactionPage: React.FC<NewTransactionPageProps> = ({
 
   const onSubmit = (data: TransactionRecord) => {
     onAddTransaction(data);
-    console.log(data);
     navigate("/dashboard"); // Redirects to the dashboard after adding a transaction
   };
 
