@@ -2,12 +2,14 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import React, { useEffect, useState } from "react";
 import { Button, Modal, Offcanvas } from "react-bootstrap";
 import { type TransactionRecord } from "../../types";
 import TransactionForm from "../TransactionForm";
+import styles from "./TransactionsTable.module.css";
 
 type TableProps = {
   transactionsHistoryList: TransactionRecord[];
@@ -31,7 +33,6 @@ const TransactionsTable: React.FC<TableProps> = ({
     TransactionRecord | undefined
   >(undefined);
   const [showEditOffcanvas, setShowEditOffcanvas] = useState(false);
-
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const handleEditClick = (transactionId: number) => {
@@ -77,11 +78,6 @@ const TransactionsTable: React.FC<TableProps> = ({
 
   const columnHelper = createColumnHelper<TransactionRecord>();
   const columns = [
-    columnHelper.display({
-      id: "rowNumber",
-      header: () => "#",
-      cell: (info) => info.row.index + 1,
-    }),
     columnHelper.accessor("amount", {
       cell: (info) => {
         const transactionType = info.row.original.type;
@@ -95,10 +91,30 @@ const TransactionsTable: React.FC<TableProps> = ({
         );
       },
       header: () => "Amount ($)",
+      sortingFn: (rowA, rowB) => {
+        let amountA = rowA.getValue("amount") as number;
+        let amountB = rowB.getValue("amount") as number;
+        const typeA = rowA.original.type;
+        const typeB = rowB.original.type;
+        if (typeA === "expense") {
+          amountA = -amountA;
+        }
+        if (typeB === "expense") {
+          amountB = -amountB;
+        }
+        return amountA - amountB;
+      },
     }),
     columnHelper.accessor("date", {
-      cell: (info) => new Date(info.getValue()).toLocaleDateString(),
+      cell: (info) => {
+        const date = new Date(info.getValue());
+        return date.toLocaleDateString("en-US", {
+          timeZone: "UTC",
+        });
+      },
       header: () => "Date",
+      sortDescFirst: true,
+      sortingFn: "datetime",
     }),
     columnHelper.accessor("category", {
       cell: (info) => info.getValue(),
@@ -133,6 +149,10 @@ const TransactionsTable: React.FC<TableProps> = ({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    initialState: {
+      sorting: [{ id: "date", desc: true }],
+    },
   });
 
   useEffect(() => {
@@ -148,12 +168,34 @@ const TransactionsTable: React.FC<TableProps> = ({
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <th key={header.id} className="text-center">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
+                    {header.isPlaceholder ? null : (
+                      <div
+                        className={
+                          header.column.getCanSort()
+                            ? `${styles.tableHeaderText}`
+                            : ""
+                        }
+                        onClick={header.column.getToggleSortingHandler()}
+                        title={
+                          header.column.getCanSort()
+                            ? header.column.getNextSortingOrder() === "asc"
+                              ? "Sort ascending"
+                              : header.column.getNextSortingOrder() === "desc"
+                              ? "Sort descending"
+                              : "Clear sort"
+                            : undefined
+                        }
+                      >
+                        {flexRender(
                           header.column.columnDef.header,
                           header.getContext()
                         )}
+                        {{
+                          asc: " 🔼",
+                          desc: " 🔽",
+                        }[header.column.getIsSorted() as string] ?? null}
+                      </div>
+                    )}
                   </th>
                 ))}
               </tr>
