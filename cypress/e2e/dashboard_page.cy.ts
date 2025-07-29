@@ -34,8 +34,8 @@ describe("Expense Tracker Dashboard Page Tests", () => {
     cy.get("table tbody tr").should("have.length", 4);
 
     // Click on the New Transaction button
-    cy.get("Button").contains("New Transaction").should("exist");
-    cy.get("Button").contains("New Transaction").click();
+    cy.get("Button").contains("Add").should("exist");
+    cy.get("Button").contains("Add").click();
     cy.url().should("include", "/new-transaction");
 
     // We are now on the New Transaction page
@@ -45,7 +45,7 @@ describe("Expense Tracker Dashboard Page Tests", () => {
     cy.get('select[name="type"]').select("Expense");
     cy.get('input[name="category"]').type("Food");
 
-    cy.get("Button").contains("Add a Transaction").click();
+    cy.get("Button").contains("Add Transaction").click();
 
     // Verify that the POST request was made with the correct data
     cy.wait("@postTransactions").then((interception) => {
@@ -92,8 +92,8 @@ describe("Expense Tracker Dashboard Page Tests", () => {
     cy.get("table tbody tr")
       .last()
       .within(() => {
-        cy.get("Button").contains("Edit").should("exist");
-        cy.get("Button").contains("Edit").click();
+        cy.get("Button[title='Edit Transaction']").should("exist");
+        cy.get("Button[title='Edit Transaction']").click();
       });
 
     // User should see a offcanvas with the title "Edit Transaction"
@@ -137,8 +137,8 @@ describe("Expense Tracker Dashboard Page Tests", () => {
         firstTransactionDate = cy.get("td").eq(1).invoke("text");
         firstTransactionType = cy.get("td").eq(2).invoke("text");
         firstTransactionCategory = cy.get("td").eq(3).invoke("text");
-        cy.get("Button").contains("Delete").should("exist");
-        cy.get("Button").contains("Delete").click();
+        cy.get("Button[title='Delete Transaction']").should("exist");
+        cy.get("Button[title='Delete Transaction']").click();
       });
 
     // Users should see a confirmation dialog
