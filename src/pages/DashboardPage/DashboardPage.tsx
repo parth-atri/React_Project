@@ -38,8 +38,8 @@ const DashboardPage: React.FC<DashboardPageProps> = ({
 
     transactionsHistoryList.forEach((transaction) => {
       const transactionDate = new Date(transaction.date);
-      const transactionMonth = transactionDate.getMonth();
-      const transactionYear = transactionDate.getFullYear();
+      const transactionMonth = transactionDate.getUTCMonth();
+      const transactionYear = transactionDate.getUTCFullYear();
 
       if (transaction.type === "expense") {
         totalExpensesOverall += transaction.amount;
