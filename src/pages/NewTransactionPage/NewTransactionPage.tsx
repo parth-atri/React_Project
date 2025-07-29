@@ -15,7 +15,11 @@ const NewTransactionPage: React.FC<NewTransactionPageProps> = ({
 
   const onSubmit = (data: TransactionRecord) => {
     onAddTransaction(data);
-    navigate("/dashboard"); // Redirects to the dashboard after adding a transaction
+    navigate("/dashboard");
+  };
+
+  const handleCancelBtnClick = () => {
+    navigate("/dashboard");
   };
 
   return (
@@ -23,7 +27,10 @@ const NewTransactionPage: React.FC<NewTransactionPageProps> = ({
       <Row className="justify-content-md-center mt-5">
         <Col md={6}>
           <h2>Add New Transaction</h2>
-          <TransactionForm onSubmit={onSubmit} />
+          <TransactionForm
+            onSubmit={onSubmit}
+            handleCancelBtnClick={handleCancelBtnClick}
+          />
         </Col>
       </Row>
     </Container>

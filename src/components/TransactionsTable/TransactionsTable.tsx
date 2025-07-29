@@ -273,7 +273,7 @@ const TransactionsTable: React.FC<TableProps> = ({
                 {">>"}
               </Button>
             </Col>
-            <Col className="d-flex justify-content-end">
+            <Col className="d-flex justify-content-end align-items-center">
               <span className="flex items-center gap-1 ms-3 me-2">
                 Go to page:{" "}
                 <input
@@ -324,6 +324,7 @@ const TransactionsTable: React.FC<TableProps> = ({
               initialValues={editInitialValues}
               onSubmit={handleEditFormSubmit}
               isEditMode={true}
+              handleCancelBtnClick={handleEditOffcanvasClose}
             />
           )}
         </Offcanvas.Body>
