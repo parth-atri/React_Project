@@ -2,11 +2,12 @@ import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
+  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import React, { useEffect, useState } from "react";
-import { Button, Modal, Offcanvas } from "react-bootstrap";
+import { Button, Col, Modal, Offcanvas, Row } from "react-bootstrap";
 import { type TransactionRecord } from "../../types";
 import TransactionForm from "../TransactionForm";
 import styles from "./TransactionsTable.module.css";
@@ -34,6 +35,10 @@ const TransactionsTable: React.FC<TableProps> = ({
   >(undefined);
   const [showEditOffcanvas, setShowEditOffcanvas] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [pagination, setPagination] = useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
 
   const handleEditClick = (transactionId: number) => {
     setSelectedTransactionId(transactionId);
@@ -153,6 +158,11 @@ const TransactionsTable: React.FC<TableProps> = ({
     columns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: setPagination,
+    state: {
+      pagination,
+    },
     initialState: {
       sorting: [{ id: "date", desc: true }],
     },
@@ -216,7 +226,85 @@ const TransactionsTable: React.FC<TableProps> = ({
             ))}
           </tbody>
         </table>
+        <div className="m-3">
+          <Row className="">
+            <Col>
+              Page{" "}
+              <strong>
+                {transactionsTable.getState().pagination.pageIndex + 1} of{" "}
+                {transactionsTable.getPageCount().toLocaleString()}
+              </strong>
+            </Col>
+            <Col className="text-center">
+              <Button
+                className="border rounded p-1 me-2"
+                variant="outline"
+                onClick={() => transactionsTable.firstPage()}
+                disabled={!transactionsTable.getCanPreviousPage()}
+              >
+                {"<<"}
+              </Button>
+              <Button
+                className="border rounded p-1 me-2"
+                variant="outline"
+                onClick={() => transactionsTable.previousPage()}
+                disabled={!transactionsTable.getCanPreviousPage()}
+              >
+                {"<"}
+              </Button>
+              <Button
+                className="border rounded p-1 me-2"
+                variant="outline"
+                onClick={() => transactionsTable.nextPage()}
+                disabled={!transactionsTable.getCanNextPage()}
+              >
+                {">"}
+              </Button>
+              <Button
+                className="border rounded p-1"
+                variant="outline"
+                onClick={() => transactionsTable.lastPage()}
+                disabled={!transactionsTable.getCanNextPage()}
+              >
+                {">>"}
+              </Button>
+            </Col>
+            <Col className="d-flex justify-content-end">
+              <span className="flex items-center gap-1 ms-3 me-2">
+                Go to page:{" "}
+                <input
+                  type="number"
+                  min="1"
+                  max={transactionsTable.getPageCount()}
+                  defaultValue={
+                    transactionsTable.getState().pagination.pageIndex + 1
+                  }
+                  onChange={(e) => {
+                    const page = e.target.value
+                      ? Number(e.target.value) - 1
+                      : 0;
+                    transactionsTable.setPageIndex(page);
+                  }}
+                  className="border p-1 rounded w-16"
+                />
+              </span>
+              <select
+                value={transactionsTable.getState().pagination.pageSize}
+                onChange={(e) => {
+                  transactionsTable.setPageSize(Number(e.target.value));
+                }}
+              >
+                {[10, 20, 30, 40, 50].map((pageSize) => (
+                  <option key={pageSize} value={pageSize}>
+                    Show {pageSize} Records
+                  </option>
+                ))}
+              </select>
+            </Col>
+          </Row>
+        </div>
       </div>
+
       <Offcanvas
         show={showEditOffcanvas}
         onHide={handleEditOffcanvasClose}
