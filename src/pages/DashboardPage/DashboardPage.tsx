@@ -1,5 +1,5 @@
 import { ResponsiveLine } from "@nivo/line";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Card, Col, Row } from "react-bootstrap";
 import Button from "react-bootstrap/esm/Button";
 import Container from "react-bootstrap/esm/Container";
@@ -21,6 +21,10 @@ const DashboardPage: React.FC<DashboardPageProps> = ({
   onUpdateTransaction,
   onDeleteTransaction,
 }) => {
+  const [chartData, setChartData] = React.useState<
+    { id: string; color: string; data: { x: string; y: number }[] }[]
+  >([]);
+
   const {
     totalExpensesOverall,
     totalIncomeOverall,
@@ -66,7 +70,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({
     };
   }, [transactionsHistoryList]);
 
-  const chartData = useMemo(() => {
+  const getChartData = () => {
     const dataMap: { [key: string]: { income: number; expense: number } } = {};
     const oneYearAgo = new Date();
     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
@@ -74,8 +78,8 @@ const DashboardPage: React.FC<DashboardPageProps> = ({
       const transactionDate = new Date(transaction.date);
       if (transactionDate < oneYearAgo) return; // Ignoring the transactions older than one year
 
-      const monthKey = `${transactionDate.getFullYear()}-${
-        transactionDate.getMonth() + 1
+      const monthKey = `${transactionDate.getUTCFullYear()}-${
+        transactionDate.getUTCMonth() + 1
       }`;
 
       if (!dataMap[monthKey]) {
@@ -110,6 +114,10 @@ const DashboardPage: React.FC<DashboardPageProps> = ({
         data: expenseData,
       },
     ];
+  };
+
+  useEffect(() => {
+    setChartData(getChartData);
   }, [transactionsHistoryList]);
 
   return (
@@ -193,23 +201,21 @@ const DashboardPage: React.FC<DashboardPageProps> = ({
                     }}
                     curve="monotoneX"
                     yFormat=" >-.2f"
-                    axisTop={null}
-                    axisRight={null}
                     axisBottom={{
                       tickSize: 5,
                       tickPadding: 5,
                       tickRotation: 45,
                       legend: "Time (Months)",
-                      legendOffset: 36,
+                      legendOffset: 45,
                       legendPosition: "middle",
-                      truncateTickAt: 50,
+                      truncateTickAt: 55,
                     }}
                     axisLeft={{
                       tickSize: 5,
                       tickPadding: 5,
                       tickRotation: 0,
                       legend: "Amount ($)",
-                      legendOffset: -40,
+                      legendOffset: -45,
                       legendPosition: "middle",
                     }}
                     pointSize={10}
@@ -224,28 +230,17 @@ const DashboardPage: React.FC<DashboardPageProps> = ({
                         direction: "column",
                         justify: false,
                         translateX: 100,
-                        translateY: 0,
-                        itemsSpacing: 0,
                         itemDirection: "left-to-right",
                         itemWidth: 80,
                         itemHeight: 20,
-                        itemOpacity: 0.75,
                         symbolSize: 12,
                         symbolShape: "circle",
                         symbolBorderColor: "rgba(0, 0, 0, .5)",
-                        effects: [
-                          {
-                            on: "hover",
-                            style: {
-                              itemBackground: "rgba(0, 0, 0, .03)",
-                              itemOpacity: 1,
-                            },
-                          },
-                        ],
                       },
                     ]}
-                    colors={["#28a745", "#dc3545"]} // Green for Income, Red for Expenses
+                    colors={["#28a745", "#dc3545"]}
                     enableArea={true}
+                    animate={true}
                   />
                 </Card.Body>
               </Card>
