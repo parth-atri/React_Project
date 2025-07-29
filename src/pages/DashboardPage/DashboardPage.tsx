@@ -1,3 +1,11 @@
+import {
+  faFileInvoiceDollar,
+  faMoneyBill1Wave,
+  faPlus,
+  faReceipt,
+  faSackDollar,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useMemo } from "react";
 import { Card, Col, Row } from "react-bootstrap";
 import Button from "react-bootstrap/esm/Button";
@@ -80,7 +88,13 @@ const DashboardPage: React.FC<DashboardPageProps> = ({
                 href="/new-transaction"
                 className="text-white text-decoration-none"
               >
-                <span>New Transaction</span>
+                <span>
+                  Add{" "}
+                  <FontAwesomeIcon
+                    icon={faPlus}
+                    title="Add a new transaction"
+                  />
+                </span>
               </a>
             </Button>
           </Col>
@@ -93,21 +107,25 @@ const DashboardPage: React.FC<DashboardPageProps> = ({
                 titleText="Income This Month"
                 valueText={totalIncomeThisMonth}
                 valueType="income"
+                iconName={faMoneyBill1Wave}
               />
               <MetricCard
                 titleText="Expenses This Month"
                 valueText={totalExpensesThisMonth}
                 valueType="expense"
+                iconName={faReceipt}
               />
               <MetricCard
                 titleText="Total Income"
                 valueText={totalIncomeOverall}
                 valueType="income"
+                iconName={faSackDollar}
               />
               <MetricCard
                 titleText="Total Expenses"
                 valueText={totalExpensesOverall}
                 valueType="expense"
+                iconName={faFileInvoiceDollar}
               />
             </Row>
 

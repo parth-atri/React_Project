@@ -12,6 +12,14 @@ import { type TransactionRecord } from "../../types";
 import TransactionForm from "../TransactionForm";
 import styles from "./TransactionsTable.module.css";
 
+import {
+  faCircleDown,
+  faCircleUp,
+  faPenToSquare,
+  faTrashCan,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 type TableProps = {
   transactionsHistoryList: TransactionRecord[];
   onUpdateTransaction: (
@@ -89,11 +97,7 @@ const TransactionsTable: React.FC<TableProps> = ({
         const amount = info.getValue();
         const textColor =
           transactionType === "expense" ? "text-danger" : "text-success";
-        return (
-          <span className={textColor}>
-            {transactionType === "expense" ? "-" : "+"}${amount.toFixed(2)}
-          </span>
-        );
+        return <span className={textColor}>${amount.toFixed(2)}</span>;
       },
       header: () => "Amount ($)",
       sortingFn: (rowA, rowB) => {
@@ -139,14 +143,14 @@ const TransactionsTable: React.FC<TableProps> = ({
             onClick={() => handleEditClick(row.original.id)}
             variant="outline-primary"
           >
-            Edit
+            <FontAwesomeIcon icon={faPenToSquare} title="Edit Transaction" />
           </Button>
           <Button
             size="sm"
             onClick={() => handleDeleteClick(row.original.id)}
             variant="outline-danger"
           >
-            Delete
+            <FontAwesomeIcon icon={faTrashCan} title="Delete Transaction" />
           </Button>
         </div>
       ),
@@ -202,10 +206,10 @@ const TransactionsTable: React.FC<TableProps> = ({
                         {flexRender(
                           header.column.columnDef.header,
                           header.getContext()
-                        )}
+                        )}{" "}
                         {{
-                          asc: " 🔼",
-                          desc: " 🔽",
+                          asc: <FontAwesomeIcon icon={faCircleUp} />,
+                          desc: <FontAwesomeIcon icon={faCircleDown} />,
                         }[header.column.getIsSorted() as string] ?? null}
                       </div>
                     )}
@@ -293,6 +297,7 @@ const TransactionsTable: React.FC<TableProps> = ({
                 onChange={(e) => {
                   transactionsTable.setPageSize(Number(e.target.value));
                 }}
+                className="form-select w-auto"
               >
                 {[10, 20, 30, 40, 50].map((pageSize) => (
                   <option key={pageSize} value={pageSize}>
