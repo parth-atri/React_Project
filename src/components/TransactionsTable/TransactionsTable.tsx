@@ -142,15 +142,17 @@ const TransactionsTable: React.FC<TableProps> = ({
             className="me-2"
             onClick={() => handleEditClick(row.original.id)}
             variant="outline-primary"
+            title="Edit Transaction"
           >
-            <FontAwesomeIcon icon={faPenToSquare} title="Edit Transaction" />
+            <FontAwesomeIcon icon={faPenToSquare} />
           </Button>
           <Button
             size="sm"
             onClick={() => handleDeleteClick(row.original.id)}
             variant="outline-danger"
+            title="Delete Transaction"
           >
-            <FontAwesomeIcon icon={faTrashCan} title="Delete Transaction" />
+            <FontAwesomeIcon icon={faTrashCan} />
           </Button>
         </div>
       ),
