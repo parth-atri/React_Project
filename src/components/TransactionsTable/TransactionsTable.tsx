@@ -110,6 +110,9 @@ const TransactionsTable: React.FC<TableProps> = ({
         const date = new Date(info.getValue());
         return date.toLocaleDateString("en-US", {
           timeZone: "UTC",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
         });
       },
       header: () => "Date",

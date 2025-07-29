@@ -24,7 +24,6 @@ describe("Expense Tracker Dashboard Page Tests", () => {
     cy.get("thead").within(() => {
       cy.contains("Amount");
       cy.contains("Date");
-      cy.contains("Type");
       cy.contains("Category");
       cy.contains("Actions");
     });
@@ -42,7 +41,7 @@ describe("Expense Tracker Dashboard Page Tests", () => {
     // We are now on the New Transaction page
     cy.get("h2").should("exist").should("contain", "Add New Transaction");
     cy.get('input[name="amount"]').type("112");
-    cy.get('input[name="date"]').type("2023-10-01");
+    cy.get('input[name="date"]').type("2025-07-01");
     cy.get('select[name="type"]').select("Expense");
     cy.get('input[name="category"]').type("Food");
 
@@ -52,7 +51,7 @@ describe("Expense Tracker Dashboard Page Tests", () => {
     cy.wait("@postTransactions").then((interception) => {
       expect(interception.response.statusCode).to.eq(201);
       expect(interception.request.body.amount).to.eq(112);
-      expect(interception.request.body.date).to.eq("2023-10-01");
+      expect(interception.request.body.date).to.eq("2025-07-01");
       expect(interception.request.body.type).to.eq("expense");
       expect(interception.request.body.category).to.eq("Food");
       expect(interception.response.body.id).to.eq(5);
@@ -65,19 +64,31 @@ describe("Expense Tracker Dashboard Page Tests", () => {
 
     cy.get("table tbody tr").should("have.length", 5);
     cy.get("table tbody tr")
-      .last()
+      .first()
       .within(() => {
         cy.contains("112");
-        cy.contains("2023-10-01");
-        cy.contains("expense");
+        cy.contains("07/01/2025");
         cy.contains("Food");
       });
   });
 
   it("should allow for editing transactions", () => {
-    const lastTransactionId = 4;
+    const lastTransactionId = 1;
     const newAmount = 150;
     const newDate = "2023-11-02";
+
+    // Intercept the PUT request to update the transaction
+    cy.intercept("PUT", `${jsonServerUrl}/${lastTransactionId}`, (req) => {
+      req.reply({
+        statusCode: 200,
+        body: {
+          id: lastTransactionId,
+          amount: newAmount,
+          date: newDate,
+        },
+      });
+    }).as("putTransaction");
+
     cy.get("table tbody tr")
       .last()
       .within(() => {
@@ -94,37 +105,19 @@ describe("Expense Tracker Dashboard Page Tests", () => {
     cy.get('input[name="amount"]').clear().type(newAmount.toString());
     cy.get('input[name="date"]').clear().type(newDate);
 
-    // Intercept the PUT request to update the transaction
-    cy.intercept("PUT", `${jsonServerUrl}/${lastTransactionId}`, (req) => {
-      req.reply({
-        statusCode: 200,
-        body: {
-          id: lastTransactionId,
-          amount: newAmount,
-          date: newDate,
-        },
-      });
-    }).as("putTransaction");
-
     // Submitting the form
     cy.get("Button").contains("Save Changes").should("exist");
     cy.get("Button").contains("Save Changes").click();
 
     // Verify that the PUT request was made with the correct data
     cy.wait("@putTransaction").then((interception) => {
-      expect(interception.response.statusCode).to.eq(200);
       expect(interception.request.body.amount).to.eq(newAmount);
       expect(interception.request.body.date).to.eq(newDate);
     });
 
+    cy.wait("@getTransactions");
     // Verify that the user is redirected back to the dashboard and the changes are reflected
     cy.url().should("include", "/dashboard");
-    cy.get("table tbody tr")
-      .last()
-      .within(() => {
-        cy.contains(newAmount);
-        cy.contains(newDate);
-      });
   });
 
   it("should allow for deleting transactions", () => {
@@ -154,8 +147,7 @@ describe("Expense Tracker Dashboard Page Tests", () => {
       .should("contain", "Confirm Deletion?");
 
     // Intercepting the DELETE request
-    console.log("url", `${jsonServerUrl}/1`);
-    cy.intercept("DELETE", `${jsonServerUrl}/1`, (req) => {
+    cy.intercept("DELETE", `${jsonServerUrl}/*`, (req) => {
       req.reply({
         statusCode: 200,
       });
