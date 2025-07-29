@@ -1,8 +1,9 @@
-import { ResponsiveLine } from "@nivo/line";
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { Card, Col, Row } from "react-bootstrap";
 import Button from "react-bootstrap/esm/Button";
 import Container from "react-bootstrap/esm/Container";
+import LineChart from "../../components/LineChart/LineChart";
+import MetricCard from "../../components/MetricCard";
 import TransactionsTable from "../../components/TransactionsTable";
 import { type TransactionRecord } from "../../types";
 import styles from "./DashboardPage.module.css";
@@ -21,10 +22,6 @@ const DashboardPage: React.FC<DashboardPageProps> = ({
   onUpdateTransaction,
   onDeleteTransaction,
 }) => {
-  const [chartData, setChartData] = React.useState<
-    { id: string; color: string; data: { x: string; y: number }[] }[]
-  >([]);
-
   const {
     totalExpensesOverall,
     totalIncomeOverall,
@@ -70,56 +67,6 @@ const DashboardPage: React.FC<DashboardPageProps> = ({
     };
   }, [transactionsHistoryList]);
 
-  const getChartData = () => {
-    const dataMap: { [key: string]: { income: number; expense: number } } = {};
-    const oneYearAgo = new Date();
-    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-    transactionsHistoryList.forEach((transaction) => {
-      const transactionDate = new Date(transaction.date);
-      if (transactionDate < oneYearAgo) return; // Ignoring the transactions older than one year
-
-      const monthKey = `${transactionDate.getUTCFullYear()}-${
-        transactionDate.getUTCMonth() + 1
-      }`;
-
-      if (!dataMap[monthKey]) {
-        dataMap[monthKey] = { income: 0, expense: 0 };
-      }
-      if (transaction.type === "income") {
-        dataMap[monthKey].income += transaction.amount;
-      } else if (transaction.type === "expense") {
-        dataMap[monthKey].expense += transaction.amount;
-      }
-    });
-
-    const incomeData = [];
-    const expenseData = [];
-    const today = new Date();
-    for (let i = 0; i < 12; i++) {
-      const month = new Date(today.getFullYear(), today.getMonth() - i, 1);
-      const monthKey = `${month.getFullYear()}-${month.getMonth() + 1}`;
-      incomeData.unshift({ x: monthKey, y: dataMap[monthKey]?.income || 0 });
-      expenseData.unshift({ x: monthKey, y: dataMap[monthKey]?.expense || 0 });
-    }
-
-    return [
-      {
-        id: "Income",
-        color: "hsl(120, 70%, 50%)",
-        data: incomeData,
-      },
-      {
-        id: "Expenses",
-        color: "hsl(0, 70%, 50%)",
-        data: expenseData,
-      },
-    ];
-  };
-
-  useEffect(() => {
-    setChartData(getChartData);
-  }, [transactionsHistoryList]);
-
   return (
     <Container className="d-flex flex-column justify-content-center">
       <div className={styles.dashboardContainer}>
@@ -142,105 +89,34 @@ const DashboardPage: React.FC<DashboardPageProps> = ({
         {transactionsHistoryList.length > 0 ? (
           <div className="mb-4">
             <Row className="mb-4">
-              <Col md={3} className="mb-3">
-                <Card className={styles.metricCard}>
-                  <Card.Body>
-                    <Card.Title>Income This Month</Card.Title>
-                    <Card.Text className="text-success">
-                      ${totalIncomeThisMonth.toFixed(2)}
-                    </Card.Text>
-                  </Card.Body>
-                </Card>
-              </Col>
-              <Col md={3} className="mb-3">
-                <Card className={styles.metricCard}>
-                  <Card.Body>
-                    <Card.Title>Expenses This Month</Card.Title>
-                    <Card.Text className="text-danger">
-                      ${totalExpensesThisMonth.toFixed(2)}
-                    </Card.Text>
-                  </Card.Body>
-                </Card>
-              </Col>
-              <Col md={3} className="mb-3">
-                <Card className={styles.metricCard}>
-                  <Card.Body>
-                    <Card.Title>Total Income</Card.Title>
-                    <Card.Text className="text-success">
-                      ${totalIncomeOverall.toFixed(2)}
-                    </Card.Text>
-                  </Card.Body>
-                </Card>
-              </Col>
-              <Col md={3} className="mb-3">
-                <Card className={styles.metricCard}>
-                  <Card.Body>
-                    <Card.Title>Total Expenses</Card.Title>
-                    <Card.Text className="text-danger">
-                      ${totalExpensesOverall.toFixed(2)}
-                    </Card.Text>
-                  </Card.Body>
-                </Card>
-              </Col>
+              <MetricCard
+                titleText="Income This Month"
+                valueText={totalIncomeThisMonth}
+                valueType="income"
+              />
+              <MetricCard
+                titleText="Expenses This Month"
+                valueText={totalExpensesThisMonth}
+                valueType="expense"
+              />
+              <MetricCard
+                titleText="Total Income"
+                valueText={totalIncomeOverall}
+                valueType="income"
+              />
+              <MetricCard
+                titleText="Total Expenses"
+                valueText={totalExpensesOverall}
+                valueType="expense"
+              />
             </Row>
 
             <Row className="mb-4 mx-0">
               <Card className="p-0">
                 <Card.Header>Income vs. Expenses (Past Year)</Card.Header>
                 <Card.Body style={{ height: "400px" }}>
-                  <ResponsiveLine
-                    data={chartData}
-                    margin={{ top: 50, right: 110, bottom: 50, left: 60 }}
-                    xScale={{ type: "point" }}
-                    yScale={{
-                      type: "linear",
-                      min: "auto",
-                      max: "auto",
-                      stacked: false,
-                      reverse: false,
-                    }}
-                    curve="monotoneX"
-                    yFormat=" >-.2f"
-                    axisBottom={{
-                      tickSize: 5,
-                      tickPadding: 5,
-                      tickRotation: 45,
-                      legend: "Time (Months)",
-                      legendOffset: 45,
-                      legendPosition: "middle",
-                      truncateTickAt: 55,
-                    }}
-                    axisLeft={{
-                      tickSize: 5,
-                      tickPadding: 5,
-                      tickRotation: 0,
-                      legend: "Amount ($)",
-                      legendOffset: -45,
-                      legendPosition: "middle",
-                    }}
-                    pointSize={10}
-                    pointColor={{ theme: "background" }}
-                    pointBorderWidth={2}
-                    pointBorderColor={{ from: "serieColor" }}
-                    pointLabelYOffset={-12}
-                    useMesh={true}
-                    legends={[
-                      {
-                        anchor: "bottom-right",
-                        direction: "column",
-                        justify: false,
-                        translateX: 100,
-                        itemDirection: "left-to-right",
-                        itemWidth: 80,
-                        itemHeight: 20,
-                        symbolSize: 12,
-                        symbolShape: "circle",
-                        symbolBorderColor: "rgba(0, 0, 0, .5)",
-                      },
-                    ]}
-                    colors={["#28a745", "#dc3545"]}
-                    enableArea={true}
-                    animate={true}
+                  <LineChart
+                    transactionsHistoryList={transactionsHistoryList}
                   />
                 </Card.Body>
               </Card>
