@@ -6,6 +6,7 @@ import NavBar from "./components/NavBar";
 import DashboardPage from "./pages/DashboardPage";
 import LandingPage from "./pages/LandingPage";
 import NewTransactionPage from "./pages/NewTransactionPage";
+import NotFound404 from "./pages/NotFound404";
 import { type TransactionRecord } from "./types/transaction-record";
 
 function App() {
@@ -109,7 +110,7 @@ function App() {
             </>
           }
         />
-        {/* TODO: Add other routes including a Not Found Route to catch 404 redirects. */}
+        <Route path="*" element={<NotFound404 />} />
       </Routes>
     </Router>
   );
